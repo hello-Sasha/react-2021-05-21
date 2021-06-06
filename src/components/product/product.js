@@ -4,13 +4,15 @@ import PropTypes from 'prop-types';
 import styles from './product.module.css';
 import { ReactComponent as Minus } from '../../icons/minus.svg';
 import { ReactComponent as Plus } from '../../icons/plus.svg';
-import { decrement, increment } from '../../redux/actions';
+import { decrement, increment, addtocart } from '../../redux/actions';
+import {useState} from 'react';
 
-const Product = ({ product, amount, increment, decrement, fetchData }) => {
+const Product = ({ product, amount, increment, decrement, fetchData, addtocart    }) => {
   useEffect(() => {
     fetchData && fetchData(product.id);
   }, []); // eslint-disable-line
 
+const [newAmount, setnewAmount] = useState(0);
   return (
     <div className={styles.product} data-id="product">
       <div className={styles.content}>
@@ -23,18 +25,31 @@ const Product = ({ product, amount, increment, decrement, fetchData }) => {
           <div className={styles.counter}>
             <div className={styles.count} data-id="product-amount">
               {amount}
+              {newAmount}
+            
             </div>
             <div className={styles.buttons}>
               <button
                 className={styles.button}
-                onClick={decrement}
+               // onClick={decrement}
+                onClick={() => {
+                  decrement();
+           
+                }}
                 data-id="product-decrement"
               >
                 <Minus />
               </button>
               <button
                 className={styles.button}
-                onClick={increment}
+                onClick={() => {
+                  setnewAmount(newAmount+1);
+                   addtocart();
+                //increment();
+                 
+      
+                 
+                }}
                 data-id="product-increment"
               >
                 <Plus />
@@ -61,7 +76,11 @@ Product.propTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  amount: state.order[props.product.id] || 0,
+ 
+    amount: state.order[props.product.id] || 0,
+    activeitem: state.order[props.product.id] || 0,
+    
+    
 });
 
 // const mapDispatchToProps = {
@@ -69,9 +88,12 @@ const mapStateToProps = (state, props) => ({
 //   decrement,
 // };
 
-const mapDispatchToProps = (dispatch, props) => ({
+const mapDispatchToProps = (dispatch, props, state) => ({
   increment: () => dispatch(increment(props.product.id)),
   decrement: () => dispatch(decrement(props.product.id)),
+  addtocart: ()=> dispatch(addtocart(props.product.id,props.product.name, props.product.price, props.newAmount ))
+  //setname: ()=>dispatch(setname( props.product.name)),
+  //addnewproduct:() =>dispatch(addnewproduct(props.product))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Product);
